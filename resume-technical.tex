@@ -1,0 +1,44 @@
+\newcommand{\resumestyle}{%
+  \usepackage{tgheros}
+  \usepackage{xcolor}
+  \renewcommand{\familydefault}{\sfdefault}
+  \definecolor{technicalaccent}{HTML}{315875}
+  \definecolor{technicalmuted}{HTML}{555555}
+  \renewcommand{\resumelinkcolor}{technicalaccent!75}
+  \setlist[itemize]{leftmargin=1.2em, itemsep=0.1em, parsep=0pt, topsep=0.25em}
+  \renewcommand{\resumesection}[1]{%
+    \Needspace{6\baselineskip}%
+    \par\addvspace{0.8em}%
+    {\bfseries\color{technicalaccent}\MakeUppercase{##1}\par}%
+    \nobreak\vspace{0.25em}%
+    {\color{technicalaccent}\hrule height 0.5pt}%
+    \nobreak\vspace{0.4em}%
+  }%
+  \renewcommand{\profileheader}[4]{%
+    {\fontsize{26}{30}\selectfont\bfseries ##4\par}%
+    \vspace{0.4em}%
+    {\fontsize{9}{12}\selectfont\color{technicalmuted}
+      ##1\par ##2 \textbullet{} ##3\par
+    }%
+  }%
+  \renewcommand{\cvevent}[5]{%
+    \Needspace{5\baselineskip}%
+    \par\addvspace{0.6em}\noindent
+    \begin{tabularx}{\linewidth}{@{}X r@{}}
+      \textbf{##1} & {\small\color{technicalmuted}##3}\\
+    \end{tabularx}\par\nobreak
+    {\small\color{technicalmuted}##2\par}\nobreak
+    \if\relax\detokenize{##4}\relax
+    \else
+      \vspace{0.25em}##4\par
+    \fi
+    \if\relax\detokenize{##5}\relax
+    \else
+      \begin{itemize}
+        ##5
+      \end{itemize}%
+    \fi
+  }%
+  \renewcommand{\labelitemi}{\textcolor{technicalaccent}{\textbullet}}%
+}
+\input{resume-traditional}

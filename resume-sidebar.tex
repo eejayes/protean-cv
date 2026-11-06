@@ -1,0 +1,176 @@
+\makeatletter
+\newcommand{\resumestyle}{%
+  \usepackage{tgheros}
+  \usepackage{xcolor}
+  \usepackage{graphicx}
+  \usepackage{flowfram}
+  \usepackage{tikz}
+  \usetikzlibrary{fadings}
+  \renewcommand{\familydefault}{\sfdefault}
+  \input{\configfile}
+  \renewcommand{\resumelinkcolor}{accent!75}
+  \pgfdeclareradialshading{portraitfade}{\pgfpoint{0cm}{0cm}}{%
+    color(0bp)=(transparent!100);
+    color(21bp)=(transparent!100);
+    color(24bp)=(transparent!0);
+    color(50bp)=(transparent!0)%
+  }%
+  \pgfdeclarefading{portraitfade}{\pgfuseshading{portraitfade}}
+  \setlist[itemize]{leftmargin=1.3em, itemsep=0pt, parsep=0pt, topsep=0.2em}
+  \newflowframe[1]{\dimexpr\textwidth-5.8cm\relax}{\textheight}{5.8cm}{0pt}[firstpage]
+  \newflowframe[>1]{\dimexpr\textwidth-5mm\relax}{\textheight}{0pt}{0pt}[continuation]
+  \newstaticframe[1]{5.1cm}{\textheight}{-0.9cm}{0pt}[sidebar]
+  \setstaticframe*{sidebar}{valign=t}
+  % Lists must recompute their paragraph width after the first-page frame changes.
+  \newcommand{\sidebarparagraphwidth}{%
+    \linewidth=\dimexpr\columnwidth-\@totalleftmargin\relax
+    \hsize=\columnwidth
+    \parshape=1 \@totalleftmargin \linewidth
+  }%
+  \newsavebox{\sidebaritembox}
+  \renewcommand{\cvitem}[1]{%
+    \par
+    \ifnum\value{page}=1
+      \setbox\sidebaritembox=\vbox{%
+        \hsize=\dimexpr\columnwidth-\@totalleftmargin\relax
+        \noindent ##1\par
+      }%
+      \Needspace{\dimexpr\ht\sidebaritembox+\dp\sidebaritembox+2\baselineskip\relax}%
+    \fi
+    \sidebarparagraphwidth
+    \item ##1%
+  }%
+  \AddToHook{shipout/background}{%
+    \ifnum\value{page}=1
+      \begin{tikzpicture}[remember picture, overlay]
+        \fill[themecontrastdark] (current page.north west)
+          rectangle ([xshift=6.9cm]current page.south west);
+      \end{tikzpicture}%
+    \fi
+  }%
+  \newlength{\sidebarlabelwidth}
+  \AddToHook{shipout/foreground}{%
+    \begin{tikzpicture}[remember picture, overlay]
+    \ifnum\value{page}>1
+    \ifnum\getpagerefnumber{sidebar-experience-start}>0
+      \ifnum\value{page}<\getpagerefnumber{sidebar-experience-start}
+      \else
+        \ifnum\value{page}>\getpagerefnumber{sidebar-experience-end}
+        \else
+            \node[anchor=east, inner sep=0pt] at
+              ([xshift=-6mm]current page.east) {%
+              \rotatebox{-90}{%
+                \begingroup
+                  \settowidth{\sidebarlabelwidth}{\LARGE\textsc{Experience}}%
+                  \shortstack{%
+                    {\LARGE\textsc{Experience}}\\
+                    \hspace{12pt}\\
+                    \textcolor{accent}{\rule{\sidebarlabelwidth}{2pt}}%
+                  }%
+                \endgroup
+              }%
+            };
+        \fi
+      \fi
+    \fi
+    \fi
+    \end{tikzpicture}%
+  }%
+  \renewcommand{\resumesection}[1]{%
+    \Needspace{5\baselineskip}%
+    \sidebarparagraphwidth
+    \par\addvspace{0.8em}%
+    {\bfseries\color{accent}\MakeUppercase{##1}\par}%
+    \nobreak\vspace{0.3em}%
+    {\color{accent}\hrule height 0.5pt}%
+    \nobreak\vspace{0.4em}%
+  }%
+  \renewcommand{\profileheader}[4]{%
+    {\fontsize{20}{23}\selectfont\bfseries ##4\par}%
+    \vspace{0.5em}%
+    {\fontsize{10}{12}\selectfont
+      ##1\par\vspace{0.5em}##2\par ##3\par
+    }%
+  }%
+  \renewcommand{\cvevent}[5]{%
+    \Needspace{5\baselineskip}%
+    \par\addvspace{0.5em}%
+    {\bfseries ##1\par}\nobreak
+    {\small ##2\par ##3\par}\nobreak
+    \if\relax\detokenize{##4}\relax
+    \else
+      \vspace{0.3em}##4\par
+    \fi
+    \if\relax\detokenize{##5}\relax
+    \else
+      \begin{itemize}
+        ##5
+      \end{itemize}%
+    \fi
+  }%
+  \renewenvironment{cvmetadata}{}{}%
+  \renewcommand{\metadatarow}[2]{\textbf{##1}\par ##2\par\vspace{0.4em}}%
+  \renewcommand{\labelitemi}{\textcolor{accent}{\textbullet}}%
+}
+
+\newcommand{\resumebody}{%
+  \begin{staticcontents*}{sidebar}
+    \color{white}%
+    \begingroup
+    \centering
+    \loadcontent{image}
+    \ifx\profileimage\empty
+    \else
+    \noindent\makebox[\linewidth][c]{%
+      \begin{tikzpicture}
+        \fill[themecontrastdark, draw=none]
+          (-0.5\linewidth,-0.5\linewidth)
+          rectangle (0.5\linewidth,0.5\linewidth);
+        \node[inner sep=0pt, draw=none] at (0,0) {%
+          \includegraphics[width=\linewidth]{\profileimage}%
+        };
+        \fill[themecontrastdark, draw=none, path fading=portraitfade]
+          (-0.5\linewidth,-0.5\linewidth)
+          rectangle (0.5\linewidth,0.5\linewidth);
+        \draw[themecontrastdark, line width=3pt]
+          (-0.5\linewidth,-0.5\linewidth)
+          rectangle (0.5\linewidth,0.5\linewidth);
+      \end{tikzpicture}%
+    }\par
+    \vspace{0.5em}%
+    \fi
+    \loadcontent{profile}
+    \loadcontent{headline}
+    \ifx\profileheadline\empty
+    \else
+      \vspace{0.5em}%
+      {\fontsize{12}{14}\selectfont\bfseries \profileheadline\par}%
+    \fi
+    \ifx\profilespecializations\empty
+    \else
+      \vspace{0.4em}%
+      {\fontsize{10}{12}\selectfont \profilespecializations\par}%
+    \fi
+    \endgroup
+    \leftskip=0pt \rightskip=0pt \parfillskip=0pt plus 1fil
+    \parindent=0pt
+    \emergencystretch=1em
+    \vspace{0.8em}%
+    {\fontsize{10}{12}\selectfont
+      \loadcontent{metasection}
+    }%
+  \end{staticcontents*}
+  \resumesection{Profile}
+  \summarytext{\loadcontent{summary_statement}}\par
+  \resumesection{Professional Experience}
+  \label{sidebar-experience-start}%
+  \loadcontent{experience}
+  \par\label{sidebar-experience-end}%
+  \clearpage
+  \resumesection{Education}
+  \loadcontent{education}
+  \resumesection{Publications}
+  \loadcontent{publications}
+}
+\makeatother
+\input{resume-traditional}

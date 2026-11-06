@@ -1,0 +1,17 @@
+\newcommand{\resumestyle}{%
+  \usepackage{tgtermes}
+  \renewcommand{\resumesection}[1]{%
+    \Needspace{6\baselineskip}%
+    \par\addvspace{1em}%
+    {\large\scshape ##1\par}%
+    \nobreak\vspace{0.5em}%
+  }%
+  \renewcommand{\profileheader}[4]{%
+    {\fontsize{26}{30}\selectfont\scshape ##4\par}%
+    \vspace{0.4em}%
+    {\fontsize{9}{12}\selectfont
+      ##1\par ##2 \textbullet{} ##3\par
+    }%
+  }%
+}
+\input{resume-traditional}

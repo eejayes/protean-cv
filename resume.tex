@@ -1,0 +1,368 @@
+\documentclass[11pt]{article}[a4paper]
+\usepackage{enumitem}    % List customization
+\usepackage{tikz}
+\usepackage{moresize}
+\usepackage{luacode}
+\usepackage{luapackageloader}
+\usepackage{tcolorbox}
+\usepackage{changepage}
+\usepackage{xcolor}
+\usepackage{changepage}
+\usepackage{calc} % used for line width arithmetic
+\usepackage{ifthen}
+\usepackage{tabularx}
+\usepackage{array} % Used to support column type formatting (e.g. >{decl.})
+\usepackage{tikz} % for drawing arrows
+\usepackage{hyperref}
+\usepackage{svg}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault} % Set sans-serif as the default
+\usepackage[T1]{fontenc} % Ensure proper font encoding
+
+\input{\configfile}
+
+\providecommand{\summarybackground}{themelight}
+\providecommand{\summaryforeground}{white}
+\providecommand{\summarydecoration}{}
+\providecommand{\summarybottompadding}{3mm}
+
+\newcommand{\regionconfig}{0}
+\newcommand{\colorconfig}{3}
+
+\showboxbreadth=0
+\showboxdepth=0
+
+\ifcase\regionconfig
+  \def\typeconvention{Resume}
+  \def\audienceregion{America}
+\else
+  \def\typeconvention{C.V.}
+  \def\audienceregion{Europe}
+\fi
+
+
+\definecolor{darkgray}{HTML}{555555}
+\definecolor{linkblue}{HTML}{1A73E8}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkblue,
+    citecolor=darkgray,
+    urlcolor=linkblue
+}
+
+% Margin strategy
+% Each section or environment shall be given ability to use the entire screen
+% width, and thus should be provided access to it. However a top an bottom margin
+% should be consistent across over the entire document, except for the header on
+% the first page.
+%
+% Therefore globally a top and bottom margin is set, and left and right margins are non-existent.
+\newcommand{\myleftmargin}{0cm}
+\newcommand{\myrightmargin}{0cm}
+% Top page margin; does not effect first page because header reversed by the same amount
+\newcommand{\headermargin}{1cm}
+\newcommand{\footermargin}{1cm}
+\newcommand{\sectionvertsep}{0.5em} % Colorbox environment margins
+\newcommand{\posttitletoitemsep}{0.5em} % Separation between post title and items
+\newcommand{\postnesteditemsep}{0em} % Separation for all items nested under top level
+\newcommand{\postnestingitemtopsep}{0em} % Nesting items only (not leaves) are separated by this amount
+\newcommand{\posttopitemssep}{0.5em} % Main bullets under post are separated by this amount
+\newcommand{\posttoptosummary}{0.5em} % Space between summary and item list
+\newcommand{\postsep}{1em} %
+
+
+% Suppress page numbering
+\pagestyle{empty}
+
+%define page styles using geometry
+\usepackage[top=\headermargin, bottom=\footermargin, left=\myleftmargin, right=\myrightmargin]{geometry}
+
+% Remove header space
+\setlength{\headheight}{0mm}
+% Don't indent paragraphs
+
+\usetikzlibrary{shapes, backgrounds,mindmap, trees}
+% include the left arrow into a tikz picture
+% param1: fill color
+%
+% a six pointed arrow poiting to the right
+\newcommand{\chevronright}{(0,0) -- (0.2,0) -- (0.3,0.2) -- (0.2,0.4) -- (0,0.4) -- (0.1,0.2) -- cycle;}
+
+% include the left arrow into a tikz picture
+% param1: fill color
+%
+\newcommand{\rarrow}[1]
+{\begin{tikzpicture}[scale=0.58]
+	 \filldraw[fill=#1!100,draw=#1!100!black]  \chevronright
+ \end{tikzpicture}
+}
+
+\newcommand{\rarrowsmall}[1]
+{\begin{tikzpicture}[scale=0.4]
+	 \filldraw[fill=#1!100,draw=#1!100!black]  \chevronright
+ \end{tikzpicture}
+}
+
+
+% a six pointed arrow poiting to the left
+\newcommand{\chevronleft}{(0,0.2) -- (0.1,0) -- (0.3,0) -- (0.2,0.2) -- (0.3,0.4) -- (0.1,0.4) -- cycle;}
+
+% include the right arrow into a tikz picture
+% param1: fill color
+%
+\newcommand{\larrow}[1]
+{\begin{tikzpicture}[scale=0.58]
+    \filldraw[fill=#1!100,draw=#1!100!black]  \chevronleft
+  \end{tikzpicture}
+}
+
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox[auto counter, number within=section]{metasectionbox}[2][]{
+  enhanced,
+  breakable,
+  colback=#2,
+  colframe=#2,
+  sharp corners,
+  before skip=0pt, after skip=0pt,
+  #1
+}
+\newtcolorbox{qualificationsbox}[2][]{
+  enhanced,
+  breakable,
+  colback=#2,
+  colframe=#2,
+  sharp corners,
+  boxrule=0pt,
+  boxsep=0pt,
+  left=1cm, right=2cm,
+  top=3mm, bottom=3mm,
+  before skip=0pt, after skip=0pt,
+  #1
+}
+\newtcolorbox[auto counter, number within=section]{mypagebox}[2][]{
+  enhanced,
+  breakable,
+  colback=#2,
+  colframe=#2,
+  left=1cm,
+  sharp corners,
+  before skip=0pt, after skip=0pt,
+  right=2cm, % Reserve space for margin comments
+  bottom=\sectionvertsep, % Section bottom sep
+  top=\sectionvertsep, % Section top sep
+  tikz={remember picture},
+  underlay unbroken and first={
+    \fill[#2] (current page.west |- frame.north) rectangle (current page.south east);
+  },
+  underlay middle and last={
+    \fill[#2] (current page.north west) rectangle (current page.south east);
+  },
+  overlay unbroken and first={
+    \node[anchor=east, align=right] at (frame.east) {\parbox[t]{1.5cm}{\rotatebox{-90}{#1}}};
+  },
+  overlay middle and last={
+    \node[anchor=east, align=right] at (frame.east) {\parbox[t]{1.5cm}{\rotatebox{-90}{#1}}};
+  }
+}
+
+
+\renewcommand{\labelitemi}{\rarrow{themelight}}
+\renewcommand{\labelitemii}{\rarrowsmall{themedark}}
+\renewcommand{\labelitemiii}{\rarrowsmall{themecontrastdark}}
+
+%============================================================================%
+% Simpler bibsection for CV sections
+% ====================
+% ENVIRONMENT
+% ====================
+\makeatletter
+\newlength{\bibhang}
+\setlength{\bibhang}{1em} %1em}
+\newlength{\bibsep}
+ {\@listi \global\bibsep\itemsep \global\advance\bibsep by\parsep}
+\newenvironment{bibsection}{
+  \begin{enumerate}{}
+    {
+      \setlength{\leftmargin}{\bibhang}%
+      \setlength{\itemindent}{-\leftmargin}%
+      \setlength{\itemsep}{\bibsep}%
+      \setlength{\parsep}{\z@}%
+      \setlength{\partopsep}{0pt}%
+      \setlength{\topsep}{0pt}
+    }
+  }
+  {\end{enumerate}\vspace{-.6\baselineskip}}
+\makeatother
+
+\newcommand{\profileheader}[4]{%
+  \def\profilecontacts{%
+    {\fontsize{9}{11}\selectfont
+      \textcolor{themecontrastlight}{#1 $\cdot$ #2 $\cdot$ #3}\par
+    }%
+  }%
+  \vspace*{0.3em}%
+  {\fontsize{24}{28}\selectfont
+    \textcolor{white}{\textsc{#4}}\par
+  }%
+}
+
+\newcommand{\cvitem}[1]{\item #1}
+\newcommand{\cvnesteditem}[2]{%
+  \cvitem{#1}%
+  \begin{itemize}[itemsep=\postnesteditemsep, parsep=0pt, topsep=\postnestingitemtopsep, left=0pt]
+    #2
+  \end{itemize}%
+}
+
+% Arguments: title, institution, dates, optional summary, optional items.
+\newcommand{\cvevent}[5]{%
+  \par\vspace{\postsep/2}\noindent
+  \begin{tabularx}{\linewidth}{@{}X r@{}}
+    \textbf{#1} \textcolor{themecontrastdark}{(#2)} & \textcolor{themecontrastdark}{#3}\\
+  \end{tabularx}\par\nobreak
+  {\color{linecol}\hrule}\nobreak
+  \if\relax\detokenize{#4}\relax
+  \else
+    \vspace{\posttoptosummary}\noindent #4\par
+  \fi
+  \if\relax\detokenize{#5}\relax
+  \else
+    \begin{itemize}[itemsep=\posttopitemssep, parsep=0pt, topsep=\posttitletoitemsep, left=0pt]
+      #5
+    \end{itemize}%
+  \fi
+  \par\vspace{\postsep/2}%
+}
+
+\newenvironment{cvmetadata}
+  {\tabularx{\textwidth}{l X}}
+  {\endtabularx}
+\newcommand{\metadatarow}[2]{%
+  \rarrow{themecontrastdark} \normalsize{\textcolor{accent}{#1}} & #2 \\
+}
+\newcommand{\metadataentry}[2]{\textbf{#1}: #2}
+\newcommand{\metadataseparator}{, }
+
+\newcommand{\summarytext}[1]{\textcolor{\summaryforeground}{#1}}
+\newcommand{\publicationentry}[2]{\item[] #1 #2}
+
+\begin{document}
+\vspace*{-\headermargin}
+%----------------------------------------------------------------------------------------
+% HEADLINE / BASIC INFORMATION
+%----------------------------------------------------------------------------------------
+%\fcolorbox{themecontrastdark}{themecontrastdark}{
+\begin{metasectionbox}[boxsep=0pt, boxrule=0pt, left=4mm, right=4mm, top=5mm, bottom=3mm]{themecontrastdark}
+  \begingroup
+    \centering
+    \directlua{
+      target = "profile"
+      spec = "resources/resume_content.yaml"
+      dofile("content_loader.lua")
+    }
+    \directlua{
+      target = "headline"
+      spec = "resources/resume_content.yaml"
+      dofile("content_loader.lua")
+    }
+    \ifx\profileheadline\empty
+    \else
+      \nointerlineskip\vspace*{0.5em}%
+      {\fontsize{13}{16}\selectfont
+        \textcolor{themecontrastlight}{\textsc{\profileheadline}}\par
+      }%
+    \fi
+    \ifx\profilespecializations\empty
+    \else
+      \nointerlineskip\vspace*{0.4em}%
+      {\fontsize{10.5}{13}\selectfont
+        \textcolor{themecontrastlight}{\profilespecializations}\par
+      }%
+    \fi
+    \nointerlineskip\vspace*{0.6em}%
+    {\color{themecontrastlight}\hrule}
+    \nointerlineskip\vspace*{3mm}%
+    \profilecontacts
+  \endgroup
+\end{metasectionbox}
+%}
+%----------------------------------------------------------------------------------------
+% SUMMARY
+%----------------------------------------------------------------------------------------
+%\fcolorbox{themelight}{themelight}{
+\begin{qualificationsbox}[bottom=\summarybottompadding]{\summarybackground}
+    \begingroup
+      \raggedright
+      \fontsize{11}{13.5}\selectfont
+%      \rarrow{white}\rarrow{white}%
+        \summarytext{\directlua{
+          target = "summary_statement"
+          spec = "resources/resume_content.yaml"
+          dofile("content_loader.lua")
+        }}
+      \par
+      \summarydecoration
+%      \larrow{white}\larrow{white}
+    \endgroup
+\end{qualificationsbox}
+%}
+%----------------------------------------------------------------------------------------
+% META
+%----------------------------------------------------------------------------------------
+\begin{qualificationsbox}{white}
+    \ifthenelse{\equal{\audienceregion}{Europe}}{
+      \def\metaspace{0.65}
+      \begin{minipage}[c]{0.25\textwidth} % Adjust overall width
+        \centering
+        \includegraphics[scale=0.182]{resources/profile_picture.jpeg}
+      \end{minipage}
+    }
+    {\def\metaspace{1}}
+    \centering
+    \begin{minipage}[c]{\metaspace\textwidth}
+      \begin{luacode}
+          target = "metasection"
+          spec = "resources/resume_content.yaml"
+          dofile("content_loader.lua")
+        \end{luacode}
+    \end{minipage}
+\end{qualificationsbox}
+
+%----------------------------------------------------------------------------------------
+% EXPERIENCE - pg1
+%----------------------------------------------------------------------------------------
+
+\newlength{\categorylength}
+
+\def\categoryname{\huge{\textsc{Experience}}}
+\settowidth{\categorylength}{\makebox[0pt][l][\categoryname]}
+\colorlet{linecol}{themecontrastlight}
+\begin{mypagebox}[\shortstack{
+     \categoryname  \\
+     \hspace{12pt} \\
+     \textcolor{themelight}{\rule{\categorylength}{2pt}}
+   }]{softcol}
+\begin{luacode}
+  target = "experience"
+  spec = "resources/resume_content.yaml"
+  dofile("content_loader.lua")
+\end{luacode}
+\end{mypagebox}
+
+\def\categoryname{\LARGE{\textsc{Education}}}
+\settowidth{\categorylength}{\makebox[0pt][l][\categoryname]}
+\colorlet{linecol}{white}
+\begin{mypagebox}[\shortstack{
+     \categoryname  \\
+     \hspace{12pt} \\
+     \textcolor{themelight}{\rule{\categorylength}{2pt}}
+   }]{themecontrastlight}
+\begin{luacode}
+  target = "education"
+  spec = "resources/resume_content.yaml"
+  dofile("content_loader.lua")
+\end{luacode}
+\end{mypagebox}
+
+\end{document}

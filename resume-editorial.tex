@@ -1,0 +1,47 @@
+\newcommand{\resumestyle}{%
+  \usepackage{tgpagella}
+  \usepackage{tgheros}
+  \usepackage{xcolor}
+  \definecolor{editorialaccent}{HTML}{365F63}
+  \definecolor{editorialmuted}{HTML}{555555}
+  \renewcommand{\resumelinkcolor}{editorialaccent!75}
+  \renewcommand{\resumesection}[1]{%
+    \Needspace{6\baselineskip}%
+    \par\addvspace{1em}%
+    {\sffamily\bfseries\color{editorialaccent}\MakeUppercase{##1}\par}%
+    \nobreak\vspace{0.3em}%
+    {\color{editorialaccent}\hrule height 0.4pt}%
+    \nobreak\vspace{0.5em}%
+  }%
+  \renewcommand{\profileheader}[4]{%
+    {\fontsize{28}{32}\selectfont ##4\par}%
+    \vspace{0.4em}%
+    {\sffamily\fontsize{9}{12}\selectfont\color{editorialmuted}
+      ##1\par ##2 \textbullet{} ##3\par
+    }%
+  }%
+  \renewcommand{\cvevent}[5]{%
+    \Needspace{5\baselineskip}%
+    \par\addvspace{0.8em}\noindent
+    \begin{tabularx}{\linewidth}{@{}X r@{}}
+      {\sffamily\bfseries ##1} &
+      {\sffamily\small\color{editorialmuted}##3}\\
+    \end{tabularx}\par\nobreak
+    {\itshape ##2\par}\nobreak
+    \if\relax\detokenize{##4}\relax
+    \else
+      \vspace{0.3em}##4\par
+    \fi
+    \if\relax\detokenize{##5}\relax
+    \else
+      \begin{itemize}
+        ##5
+      \end{itemize}%
+    \fi
+  }%
+  \renewcommand{\metadatarow}[2]{%
+    {\sffamily\small\bfseries ##1} & ##2\\
+  }%
+  \renewcommand{\labelitemi}{\textcolor{editorialaccent}{\textbullet}}%
+}
+\input{resume-traditional}
